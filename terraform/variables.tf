@@ -23,7 +23,11 @@ variable "cluster_name" {
 }
 
 variable "machine_type" {
-  default = "f1-micro"
+    default = "e2-micro"
+}
+
+variable "gke_machine_type" {
+    default = "e2-standard-2"
 }
 
 variable "project" {
@@ -35,7 +39,7 @@ variable "replicas" {
   default     = "1"
 }
 
-variable "version" {
+variable "ver" {
   type = string
 }
 

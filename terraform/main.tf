@@ -78,9 +78,9 @@ data "template_file" "startup_script" {
 EOF
 
 
-  vars {
+  vars = {
     project = var.project
-    version = var.version
+    version = var.ver
   }
 }
 
@@ -101,7 +101,7 @@ resource "google_compute_instance" "container_server" {
     }
   }
 
-  metadata {
+  metadata = {
     user-data = data.template_file.startup_script.rendered
   }
 
@@ -137,7 +137,7 @@ resource "google_container_node_pool" "primary_preemptible_nodes" {
 
   node_config {
     preemptible  = true
-    machine_type = "e2-standard-2"
+    machine_type = var.gke_machine_type 
 
     # Google recommends custom service accounts that have cloud-platform scope and permissions granted via IAM Roles.
     oauth_scopes = [
@@ -185,9 +185,9 @@ data "template_file" "deployment_manifest" {
             initialDelaySeconds: 10
 EOF
 
-  vars {
+  vars = {
     project  = var.project
-    version  = var.version
+    version  = var.ver
     replicas = var.replicas
   }
 
@@ -197,7 +197,7 @@ EOF
 // https://www.terraform.io/docs/provisioners/null_resource.html
 resource "null_resource" "deployment_manifest" {
 
-  triggers {
+  triggers = {
     template = data.template_file.deployment_manifest.rendered
   }
 
@@ -229,7 +229,7 @@ resource "google_storage_bucket" "artifact_store" {
 
 // https://www.terraform.io/docs/providers/google/r/storage_bucket_object.html
 resource "google_storage_bucket_object" "artifact" {
-  name   = "${var.version}/flask-prime.tgz"
+  name   = "${var.ver}/flask-prime.tgz"
   source = "../build/flask-prime.tgz"
   bucket = google_storage_bucket.artifact_store.name
   // TODO: ignore lifecycle something so old versions don't get deleted
@@ -237,9 +237,9 @@ resource "google_storage_bucket_object" "artifact" {
 
 data "template_file" "web_init" {
   template = file("${path.module}/web-init.sh.tmpl")
-  vars {
+  vars = {
     bucket  = "${var.project}-vm-artifacts"
-    version = var.version
+    version = var.ver
   }
 }
 
