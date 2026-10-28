@@ -20,7 +20,7 @@ limitations under the License.
 // develop this example.
 
 provider "google" {
-  version = "~> 2.11.0"
+  version = "~> 8.9.0"
 }
 
 provider "null" {
